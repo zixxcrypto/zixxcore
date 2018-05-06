@@ -1,0 +1,12 @@
+[Desktop Entry]
+Encoding=UTF-8
+Name=Zixx
+Comment=Zixx P2P Cryptocurrency
+Comment[fr]=Zixx, monnaie virtuelle cryptographique pair à pair
+Comment[tr]=Zixx, eşten eşe kriptografik sanal para birimi
+Exec=zixx-qt %u
+Terminal=false
+Type=Application
+Icon=zixx128
+MimeType=x-scheme-handler/zixx;
+Categories=Office;Finance;

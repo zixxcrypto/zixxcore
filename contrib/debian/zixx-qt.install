@@ -1,0 +1,6 @@
+usr/local/bin/zixx-qt usr/bin
+share/pixmaps/zixx32.xpm usr/share/pixmaps
+share/pixmaps/zixx16.xpm usr/share/pixmaps
+share/pixmaps/zixx128.png usr/share/pixmaps
+debian/zixx-qt.desktop usr/share/applications
+debian/zixx-qt.protocol usr/share/kde4/services/

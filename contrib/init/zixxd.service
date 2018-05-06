@@ -1,0 +1,22 @@
+[Unit]
+Description=Zixx's distributed currency daemon
+After=network.target
+
+[Service]
+User=zixx
+Group=zixx
+
+Type=forking
+PIDFile=/var/lib/zixxd/zixxd.pid
+ExecStart=/usr/bin/zixxd -daemon -pid=/var/lib/zixxd/zixxd.pid \
+-conf=/etc/zixx/zixx.conf -datadir=/var/lib/zixxd -disablewallet
+
+Restart=always
+PrivateTmp=true
+TimeoutStopSec=60s
+TimeoutStartSec=2s
+StartLimitInterval=120s
+StartLimitBurst=5
+
+[Install]
+WantedBy=multi-user.target
