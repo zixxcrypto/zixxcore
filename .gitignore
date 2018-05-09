@@ -80,13 +80,16 @@ win32-build
 test/config.ini
 test/cache/*
 
-!src/leveldb*/Makefile
-!depends/Makefile
-
 /doc/doxygen/
 
 libbitcoinconsensus.pc
 contrib/devtools/split-debug.sh
 qa/pull-tester/tests_config.py
-src/test/buildenv.py
 qa/pull-tester/run-bitcoind-for-test.sh
+src/test/buildenv.py
+
+# Adding the some required files.
+!src/leveldb*/Makefile
+!depends/Makefile
+!contrib/macdeploy/background.tiff
+!src/secp256k1/build-aux/m4/*.m4
