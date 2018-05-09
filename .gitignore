@@ -92,4 +92,5 @@ src/test/buildenv.py
 !src/leveldb*/Makefile
 !depends/Makefile
 !contrib/macdeploy/background.tiff
-!src/secp256k1/build-aux/m4/*.m4
+!src/secp256k1/build-aux/m4/bitcoin_secp.m4
+!src/secp256k1/build-aux/m4/ax_prog_cc_for_build.m4
