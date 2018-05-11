@@ -78,10 +78,12 @@ void MasternodeCreateDialog::_initialize()
 void MasternodeCreateDialog::_reset()
 {
     // Disable and uncheck
+    _ui->checkboxWalletLocked->setEnabled(false);
     _ui->checkboxFundsAvailable->setEnabled(false);
     _ui->checkboxFundsConfirmed->setEnabled(false);
     _ui->checkboxIPAddressValid->setEnabled(false);
 
+    _ui->checkboxWalletLocked->setChecked(false);
     _ui->checkboxFundsAvailable->setChecked(false);
     _ui->checkboxFundsConfirmed->setChecked(false);
     _ui->checkboxIPAddressValid->setChecked(false);
@@ -132,7 +134,20 @@ bool MasternodeCreateDialog::_run_automaton()
         _set_error(MCDSE_ERROR_NONE, "");
     }
         break;
+    case MCDS_STEP_WALLET_UNLOCKED_CHECK_BEGIN:
+    {
+        bool locked = false;
+        auto encryption = _wallet_model->getEncryptionStatus();
+        locked = (encryption == WalletModel::UnlockedForMixingOnly) || (encryption == WalletModel::Locked);
+        if (locked) {
+            _set_progress(MCDS_STEP_LAST);
+            _set_error(MCDSE_ERROR_WALLET_LOCKED, "Please unlock the wallet before proceeding.");
+        }
 
+        _set_progress(MCDS_STEP_WALLET_UNLOCKED_CHECK_DONE);
+        _set_ui_element(MCDUIE_WALLET_LOCKED_CHECKBOX, !locked);
+    }
+        break;
     case MCDS_STEP_FUNDS_VALIDITY_CHECK_BEGIN:
     {
         // First check
@@ -190,6 +205,9 @@ void MasternodeCreateDialog::_set_ui_element(enum MasternodeCreateDialogUIElemen
 {
     switch (elm)
     {
+    case MCDUIE_WALLET_LOCKED_CHECKBOX:
+        _ui->checkboxWalletLocked->setChecked(state);
+        break;
     case MCDUIE_FUNDS_AVAILABLE_CHECKBOX:
         _ui->checkboxFundsAvailable->setChecked(state);
         break;

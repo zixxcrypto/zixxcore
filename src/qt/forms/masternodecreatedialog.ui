@@ -140,28 +140,28 @@ Press the &quot;Continue&quot; button to evaluate the conditions and proceed.</s
          </item>
          <item>
           <layout class="QFormLayout" name="formLayout">
-           <item row="1" column="0">
+           <item row="2" column="0">
             <widget class="QCheckBox" name="checkboxFundsAvailable">
              <property name="text">
               <string>Funds Available</string>
              </property>
             </widget>
            </item>
-           <item row="2" column="0">
+           <item row="3" column="0">
             <widget class="QCheckBox" name="checkboxFundsConfirmed">
              <property name="text">
               <string>Funds Confirmed</string>
              </property>
             </widget>
            </item>
-           <item row="3" column="0">
+           <item row="4" column="0">
             <widget class="QCheckBox" name="checkboxIPAddressValid">
              <property name="text">
               <string>Connectivity Status</string>
              </property>
             </widget>
            </item>
-           <item row="5" column="1">
+           <item row="7" column="1">
             <layout class="QHBoxLayout" name="horizontalLayout_2">
              <property name="sizeConstraint">
               <enum>QLayout::SetFixedSize</enum>
@@ -213,7 +213,7 @@ Press the &quot;Continue&quot; button to evaluate the conditions and proceed.</s
              </item>
             </layout>
            </item>
-           <item row="4" column="0" colspan="2">
+           <item row="6" column="0" colspan="2">
             <widget class="QProgressBar" name="progressBar">
              <property name="sizePolicy">
               <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
@@ -229,10 +229,17 @@ Press the &quot;Continue&quot; button to evaluate the conditions and proceed.</s
              </property>
             </widget>
            </item>
-           <item row="5" column="0">
+           <item row="7" column="0">
             <widget class="QLabel" name="errorLabel">
              <property name="text">
               <string/>
+             </property>
+            </widget>
+           </item>
+           <item row="1" column="0">
+            <widget class="QCheckBox" name="checkboxWalletLocked">
+             <property name="text">
+              <string>Wallet Unlocked</string>
              </property>
             </widget>
            </item>

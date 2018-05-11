@@ -16,6 +16,7 @@ class CConnman;
 static const int MASTERNODE_CHECK_SECONDS               =   5;
 static const int MASTERNODE_MIN_MNB_SECONDS             =   5 * 60;
 static const int MASTERNODE_MIN_MNP_SECONDS             =  10 * 60;
+static const int MASTERNODE_HEALHTY_PING_SECONDS        =  45 * 60; // This gives us a good margin
 static const int MASTERNODE_EXPIRATION_SECONDS          =  65 * 60;
 static const int MASTERNODE_WATCHDOG_MAX_SECONDS        = 120 * 60;
 static const int MASTERNODE_NEW_START_REQUIRED_SECONDS  = 180 * 60;
@@ -286,6 +287,8 @@ public:
     void RemoveGovernanceObject(uint256 nGovernanceObjectHash);
 
     void UpdateWatchdogVoteTime(uint64_t nVoteTime = 0);
+
+    bool is_watchdog_expired_enabled() const { return sporkManager.IsSporkActive(SPORK_99_MASTERNODE_WATCHDOG_ENABLED); }
 
     CMasternode& operator=(CMasternode const& from)
     {

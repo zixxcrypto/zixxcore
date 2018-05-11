@@ -203,9 +203,10 @@ public:
 
         checkpointData = (CCheckpointData) {
             boost::assign::map_list_of
-            (  0,       uint256S("0x000006e84d14c5c0d0025253a5198a0fc4b02a9208a46a2e89b768f7b6967f16")),
-            1503127892, // * UNIX timestamp of last checkpoint block
-            0,          // * total number of transactions between genesis and last checkpoint
+            (  0,       uint256S("0x000006e84d14c5c0d0025253a5198a0fc4b02a9208a46a2e89b768f7b6967f16"))
+            ( 200,      uint256S("0x0000000001b1842cac7d3a16c5259295f3c689c07695897970b25a83322ee671")),
+            1525794600, // * UNIX timestamp of last checkpoint block
+            2662,       // * total number of transactions between genesis and last checkpoint
                         //   (the tx=... number in the SetBestChain debug.log lines)
             5000        // * estimated number of transactions per day after checkpoint
         };
@@ -275,7 +276,7 @@ public:
         consensus.defaultAssumeValid = uint256S("0x0000000004f5aef732d572ff514af99a995702c92e4452c7af10858231668b1f"); // 37900
 
         // The development subsidy should start and end at the following blocks - 0 based.
-        consensus.dev_subsidy_start_block = 5000;
+        consensus.dev_subsidy_start_block = 110;
         consensus.dev_subsidy_end_block = std::numeric_limits<uint32_t>::max();
 
         // In %;
@@ -292,8 +293,8 @@ public:
         dev_subsidy.push_back(DevSubsidyEntry("yYJu3m9kJSCCCKKQBnMHvzzRv34JL5cvEW", 100));
         dev_subsidy.push_back(DevSubsidyEntry("yip7SaPP5xdkCvFNnrC8eSanZepe57FtAv", 100));
 
-        pchMessageStart[0] = 0xab;
-        pchMessageStart[1] = 0x76;
+        pchMessageStart[0] = 0xfe;
+        pchMessageStart[1] = 0xca;
         pchMessageStart[2] = 0x98;
         pchMessageStart[3] = 0xe1;
         vAlertPubKey = ParseHex("04517d8a699cb43d3938d7b24faaff7cda448ca4ea267723ba614784de661949bf632d6304316b244646dea079735b9a6fc4af804efb4752075b9fe2245e14e412");

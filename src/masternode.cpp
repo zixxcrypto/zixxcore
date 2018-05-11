@@ -208,16 +208,25 @@ void CMasternode::Check(bool fForce)
 
         bool fWatchdogActive = masternodeSync.IsSynced() && mnodeman.IsWatchdogActive();
         bool fWatchdogExpired = (fWatchdogActive && ((GetAdjustedTime() - nTimeLastWatchdogVote) > MASTERNODE_WATCHDOG_MAX_SECONDS));
+        bool watchdog_feature_active = is_watchdog_expired_enabled();
 
-        LogPrint("masternode", "CMasternode::Check -- outpoint=%s, nTimeLastWatchdogVote=%d, GetAdjustedTime()=%d, fWatchdogExpired=%d\n",
-                vin.prevout.ToStringShort(), nTimeLastWatchdogVote, GetAdjustedTime(), fWatchdogExpired);
+        LogPrint("masternode", "CMasternode::Check -- outpoint=%s, nTimeLastWatchdogVote=%d, GetAdjustedTime()=%d, fWatchdogExpired=%d, watchdog_feature_active=%d\n",
+                vin.prevout.ToStringShort(), nTimeLastWatchdogVote, GetAdjustedTime(), fWatchdogExpired, watchdog_feature_active);
 
-        if(fWatchdogExpired) {
-            nActiveState = MASTERNODE_WATCHDOG_EXPIRED;
-            if(nActiveStatePrev != nActiveState) {
-                LogPrint("masternode", "CMasternode::Check -- Masternode %s is in %s state now\n", vin.prevout.ToStringShort(), GetStateString());
+        if (watchdog_feature_active) {
+            if(fWatchdogExpired) {
+                nActiveState = MASTERNODE_WATCHDOG_EXPIRED;
+                if(nActiveStatePrev != nActiveState) {
+                    LogPrint("masternode", "CMasternode::Check -- Masternode %s is in %s state now\n", vin.prevout.ToStringShort(), GetStateString());
+                }
+                return;
             }
-            return;
+        }
+        else {
+            bool mn_should_ping = (fWatchdogActive && ((GetAdjustedTime() - nTimeLastWatchdogVote) > MASTERNODE_HEALHTY_PING_SECONDS));
+            if (mn_should_ping && fOurMasternode) {
+                activeMasternode.UpdateSentinelPing(DEFAULT_SENTINEL_VERSION);
+            }
         }
 
         if(!IsPingedWithin(MASTERNODE_EXPIRATION_SECONDS)) {

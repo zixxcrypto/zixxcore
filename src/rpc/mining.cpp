@@ -416,7 +416,13 @@ UniValue getblocktemplate(const UniValue& params, bool fHelp)
             "      ,...\n"
             "  ],\n"
             "  \"superblocks_started\" : true|false, (boolean) true, if superblock payments started\n"
-            "  \"superblocks_enabled\" : true|false  (boolean) true, if superblock payments are enabled\n"
+            "  \"superblocks_enabled\" : true|false,  (boolean) true, if superblock payments are enabled\n"
+            "  \"subsidy_enabled\" : true|false,  (boolean) true, if subsidy payments are enabled\n"
+            "  \"subsidy\" : {                  (json object) required masternode payee that must be included in the next block\n"
+            "      \"address\" : \"xxxx\",             (string) subsidy address\n"
+            "      \"amount\" : \"xxxx\"             (string) numeric amount\n"
+            "      }\n"
+
             "}\n"
 
             "\nExamples:\n"
@@ -743,6 +749,29 @@ UniValue getblocktemplate(const UniValue& params, bool fHelp)
     result.push_back(Pair("superblock", superblockObjArray));
     result.push_back(Pair("superblocks_started", pindexPrev->nHeight + 1 > Params().GetConsensus().nSuperblockStartBlock));
     result.push_back(Pair("superblocks_enabled", sporkManager.IsSporkActive(SPORK_9_SUPERBLOCKS_ENABLED)));
+
+     // ZIXX subsidy is scoped.
+    UniValue subsidy(UniValue::VOBJ);
+
+    bool subsidy_enabled = false;
+    int height = chainActive.Height();
+    const Consensus::Params consensus = Params().GetConsensus();
+    if ((height >= consensus.dev_subsidy_start_block) && (height < consensus.dev_subsidy_end_block)) {
+        subsidy_enabled = true;
+        // Get the correct subsidy entry
+        DevSubsidyEntry expected = Params().GetDevSubsidyAtHeight(height);
+        int64_t extra_reward = ((consensus.dev_subsidy_percentage / 100.) * (expected.quota / 100.) * GetBlockSubsidy(pblock->nBits, height, consensus));
+
+        subsidy.push_back(Pair("address", expected.address));
+        subsidy.push_back(Pair("amount", extra_reward));
+    }
+    else {
+        // No-one to pay. Booo!
+        subsidy.push_back(Pair("address", ""));
+        subsidy.push_back(Pair("amount", ""));
+    }
+    result.push_back(Pair("subsidy_enabled", subsidy_enabled));
+    result.push_back(Pair("subsidy", subsidy));
 
     return result;
 }
