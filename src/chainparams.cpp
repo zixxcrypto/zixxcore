@@ -133,16 +133,16 @@ public:
         consensus.dev_subsidy_start_block = 15000;
         consensus.dev_subsidy_end_block = std::numeric_limits<uint32_t>::max();
 
-        dev_subsidy.push_back(DevSubsidyEntry("zWYfGpcMMemnjyhCFJGszoqnVDzaZm1c8y", 100));
-        dev_subsidy.push_back(DevSubsidyEntry("zFC5GQzp6veFH2JFY6c1NYNpWS1yoXvZ4p", 100));
-        dev_subsidy.push_back(DevSubsidyEntry("zBCyYHKR4uSgajH3WbCHwXLi5Mpk5jRkeS", 100));
-        dev_subsidy.push_back(DevSubsidyEntry("zJNThSenZT3tZ41QurPLJSdpXPfFmffaP1", 100));
-        dev_subsidy.push_back(DevSubsidyEntry("zUMLFhS5LBpc5HJF5CHPffV5DB6i4pPgJK", 100));
-        dev_subsidy.push_back(DevSubsidyEntry("zJ45mWHCh1PMSLC5PkJnCLjNpQkNoG2Dbc", 100));
-        dev_subsidy.push_back(DevSubsidyEntry("zMBwsjbd63QY5qNSSPSG3cceMwMAnqGV7S", 100));
-        dev_subsidy.push_back(DevSubsidyEntry("zDHKLRf2JZDxvXEuHbM9qevFVZeSkSk2gW", 100));
-        dev_subsidy.push_back(DevSubsidyEntry("zMxmHG2mvo42UudZ5V7xqjQQcg2vowez8k", 100));
         dev_subsidy.push_back(DevSubsidyEntry("zET3frUzt2UDRN7LsPTk2isXR2kX4DpnHP", 100));
+        dev_subsidy.push_back(DevSubsidyEntry("zFC5GQzp6veFH2JFY6c1NYNpWS1yoXvZ4p", 100));
+        dev_subsidy.push_back(DevSubsidyEntry("zWYfGpcMMemnjyhCFJGszoqnVDzaZm1c8y", 100));
+        dev_subsidy.push_back(DevSubsidyEntry("zJNThSenZT3tZ41QurPLJSdpXPfFmffaP1", 100));
+        dev_subsidy.push_back(DevSubsidyEntry("zBCyYHKR4uSgajH3WbCHwXLi5Mpk5jRkeS", 100));
+        dev_subsidy.push_back(DevSubsidyEntry("zUMLFhS5LBpc5HJF5CHPffV5DB6i4pPgJK", 100));
+        dev_subsidy.push_back(DevSubsidyEntry("zMBwsjbd63QY5qNSSPSG3cceMwMAnqGV7S", 100));
+        dev_subsidy.push_back(DevSubsidyEntry("zJ45mWHCh1PMSLC5PkJnCLjNpQkNoG2Dbc", 100));
+        dev_subsidy.push_back(DevSubsidyEntry("zMxmHG2mvo42UudZ5V7xqjQQcg2vowez8k", 100));
+        dev_subsidy.push_back(DevSubsidyEntry("zDHKLRf2JZDxvXEuHbM9qevFVZeSkSk2gW", 100));
 
         // In %;
         consensus.dev_subsidy_percentage = 10;
@@ -292,6 +292,7 @@ public:
         dev_subsidy.push_back(DevSubsidyEntry("yc2Tps3UfWzB6YBbH1m7FLh7BsYGC4VA6t", 100));
         dev_subsidy.push_back(DevSubsidyEntry("yYJu3m9kJSCCCKKQBnMHvzzRv34JL5cvEW", 100));
         dev_subsidy.push_back(DevSubsidyEntry("yip7SaPP5xdkCvFNnrC8eSanZepe57FtAv", 100));
+
 
         pchMessageStart[0] = 0xfe;
         pchMessageStart[1] = 0xca;

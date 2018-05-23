@@ -53,7 +53,8 @@ public:
         painter->save();
 
         // Making things.
-        QColor pen = QColor(0x76, 0x73, 0x89);
+        // color: #42475D - Just to make it easier to find.
+        QColor pen = QColor(0x42, 0x47, 0x5D);
         painter->setFont(_font);
 
         QIcon icon = qvariant_cast<QIcon>(index.data(TransactionTableModel::RawDecorationRole));
