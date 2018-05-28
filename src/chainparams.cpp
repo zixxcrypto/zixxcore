@@ -173,7 +173,8 @@ public:
         vSeeds.push_back(CDNSSeedData("node01.zixx.org",  "node01.zixx.org"));
         vSeeds.push_back(CDNSSeedData("node02.zixx.org",  "node02.zixx.org"));
         vSeeds.push_back(CDNSSeedData("node03.zixx.org",  "node03.zixx.org"));
-
+        vSeeds.push_back(CDNSSeedData("node04.zixx.org",  "node04.zixx.org"));
+        vSeeds.push_back(CDNSSeedData("node05.zixx.org",  "node05.zixx.org"));
 
         // Zixx addresses start with 'z'
         base58Prefixes[PUBKEY_ADDRESS] = std::vector<unsigned char>(1,142);

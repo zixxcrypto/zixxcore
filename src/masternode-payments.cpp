@@ -281,8 +281,11 @@ void CMasternodePayments::FillBlockPayee(CMutableTransaction& txNew, int nBlockH
     }
 
     // GET MASTERNODE PAYMENT VARIABLES SETUP
-    CAmount masternodePayment = GetMasternodePayment(nBlockHeight, blockReward, false);
-    // split reward between miner ...
+    // Here we get the percentage of the full reward
+    CAmount masternodePayment = GetMasternodePayment(nBlockHeight, blockReward);
+    // And subctract from the miner, the value that we've received.
+    // The miner should have been set previously, at block creation time
+    // ... and should already have the subsidy deducted
     txNew.vout[0].nValue -= masternodePayment;
     // ... and masternode
     txoutMasternodeRet = CTxOut(masternodePayment, payee);
@@ -547,7 +550,7 @@ bool CMasternodeBlockPayees::IsTransactionValid(const CTransaction& txNew)
     int nMaxSignatures = 0;
     std::string strPayeesPossible = "";
 
-    CAmount nMasternodePayment = GetMasternodePayment(nBlockHeight, txNew.GetValueOut(), true);
+    CAmount nMasternodePayment = GetMasternodePayment(nBlockHeight, txNew.GetValueOut());
 
     //require at least MNPAYMENTS_SIGNATURES_REQUIRED signatures
 
@@ -562,7 +565,24 @@ bool CMasternodeBlockPayees::IsTransactionValid(const CTransaction& txNew)
 
     BOOST_FOREACH(CMasternodePayee& payee, vecPayees) {
         if (payee.GetVoteCount() >= MNPAYMENTS_SIGNATURES_REQUIRED) {
+
+            CTxOut expected_txout(nMasternodePayment, payee.GetPayee());
             BOOST_FOREACH(CTxOut txout, txNew.vout) {
+
+                LogPrint("validation", "MN Received output: ");
+                LogPrint("validation", txout.ToString().c_str());
+                LogPrint("validation", "\n");
+                LogPrint("validation", "MN Expected output: ");
+                LogPrint("validation", expected_txout.ToString().c_str());
+                LogPrint("validation", "\n");
+
+                LogPrint("validation", "-----------\n");
+                LogPrint("validation", "MN Received value: ");
+                LogPrint("validation", "%i\n", txout.nValue);
+                LogPrint("validation", "Expected value: ");
+                LogPrint("validation", "%i\n", nMasternodePayment);
+
+
                 if (payee.GetPayee() == txout.scriptPubKey && nMasternodePayment == txout.nValue) {
                     LogPrint("mnpayments", "CMasternodeBlockPayees::IsTransactionValid -- Found required payment\n");
                     return true;
