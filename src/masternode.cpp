@@ -1,4 +1,5 @@
-// Copyright (c) 2014-2017 The Zixx developers
+// Copyright (c) 2014-2017 The Dash Core developers
+// Copyright (c) 2018-2018 The Zixx developers
 // Distributed under the MIT/X11 software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -16,6 +17,7 @@
 #ifdef ENABLE_WALLET
 #include "wallet/wallet.h"
 #endif // ENABLE_WALLET
+
 
 #include <boost/lexical_cast.hpp>
 
@@ -382,12 +384,25 @@ bool CMasternodeBroadcast::Create(std::string strService, std::string strKeyMast
     CService service;
     if (!Lookup(strService.c_str(), service, 0, false))
         return Log(strprintf("Invalid address %s for masternode.", strService));
+
+
+    // ZIXX Team - Multiport masternode
     int mainnetDefaultPort = Params(CBaseChainParams::MAIN).GetDefaultPort();
-    if (Params().NetworkIDString() == CBaseChainParams::MAIN) {
-        if (service.GetPort() != mainnetDefaultPort)
-            return Log(strprintf("Invalid port %u for masternode %s, only %d is supported on mainnet.", service.GetPort(), strService, mainnetDefaultPort));
-    } else if (service.GetPort() == mainnetDefaultPort)
-        return Log(strprintf("Invalid port %u for masternode %s, %d is the only supported on mainnet.", service.GetPort(), strService, mainnetDefaultPort));
+    if (!sporkManager.IsSporkActive(SPORK_98_MASTERNODE_MULTIPORT_ENABLED))
+    {
+        if (Params().NetworkIDString() == CBaseChainParams::MAIN) {
+            if (service.GetPort() != mainnetDefaultPort) {
+                return Log(strprintf("Invalid port %u for masternode %s, only %d is supported on mainnet.", service.GetPort(), strService, mainnetDefaultPort));
+            }
+        }
+    }
+
+    // Do not use mainnet port on another network.
+    if (Params().NetworkIDString() != CBaseChainParams::MAIN) {
+        if (service.GetPort() == mainnetDefaultPort) {
+            return Log(strprintf("Invalid port %u for masternode %s, %d is the only supported on mainnet.", service.GetPort(), strService, mainnetDefaultPort));
+        }
+    }
 
     return Create(outpoint, service, keyCollateralAddressNew, pubKeyCollateralAddressNew, keyMasternodeNew, pubKeyMasternodeNew, strErrorRet, mnbRet);
 }

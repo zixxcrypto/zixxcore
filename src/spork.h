@@ -1,4 +1,5 @@
-// Copyright (c) 2014-2017 The Zixx developers
+// Copyright (c) 2014-2017 The Dash Core developers
+// Copyright (c) 2018-2018 The Zixx developers
 // Distributed under the MIT/X11 software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -28,6 +29,9 @@ static const int SPORK_10_MASTERNODE_PAY_UPDATED_NODES                  = 10009;
 static const int SPORK_12_RECONSIDER_BLOCKS                             = 10011;
 static const int SPORK_13_OLD_SUPERBLOCK_FLAG                           = 10012;
 static const int SPORK_14_REQUIRE_SENTINEL_FLAG                         = 10013;
+
+static const int SPORK_97_MIN_VERSION_WATERMARK                         = 10098; // ZIXX Specific sporks will contain an offset to avoid nightmarish merge issues.
+static const int SPORK_98_MASTERNODE_MULTIPORT_ENABLED                  = 10099; // ZIXX Specific sporks will contain an offset to avoid nightmarish merge issues.
 static const int SPORK_99_MASTERNODE_WATCHDOG_ENABLED                   = 10100; // ZIXX Specific sporks will contain an offset to avoid nightmarish merge issues.
 
 static const int64_t SPORK_2_INSTANTSEND_ENABLED_DEFAULT                = 0;            // ON
@@ -40,6 +44,8 @@ static const int64_t SPORK_10_MASTERNODE_PAY_UPDATED_NODES_DEFAULT      = 407090
 static const int64_t SPORK_12_RECONSIDER_BLOCKS_DEFAULT                 = 0;             // 0 BLOCKS
 static const int64_t SPORK_13_OLD_SUPERBLOCK_FLAG_DEFAULT               = 4070908800ULL; // OFF
 static const int64_t SPORK_14_REQUIRE_SENTINEL_FLAG_DEFAULT             = 4070908800ULL; // OFF
+static const int64_t SPORK_97_MIN_VERSION_WATERMARK_DEFAULT             = 4070908800ULL; // OFF
+static const int64_t SPORK_98_MASTERNODE_MULTIPORT_DEFAULT              = 4070908800ULL; // OFF
 static const int64_t SPORK_99_MASTERNODE_WATCHDOG_ENABLED_DEFAULT       = 4070908800ULL; // OFF
 
 extern std::map<uint256, CSporkMessage> mapSporks;

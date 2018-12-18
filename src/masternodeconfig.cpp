@@ -3,6 +3,7 @@
 #include "masternodeconfig.h"
 #include "util.h"
 #include "chainparams.h"
+#include "spork.h"
 
 #include <boost/filesystem.hpp>
 #include <boost/filesystem/fstream.hpp>
@@ -22,7 +23,7 @@ bool CMasternodeConfig::read(std::string& strErr) {
 
     if (!streamConfig.good()) {
         FILE* configFile = fopen(pathMasternodeConfigFile.string().c_str(), "a");
-        if (configFile != NULL) {
+        if (configFile != nullptr) {
             std::string strHeader = "# Masternode Configuration Entries\n"
                                     "# Format: alias IP:port masternodeprivkey collateral_output_txid collateral_output_index\n"
                                     "# Example: mn1 10.0.0.1:44845 93HaYBVUCYjEMeeH1Y4sBGLALQZE1Yc1K64xiqgX37tGBDQL8Xg 2bcd3c84c84f87eaa86e4e56834c92927a07f9e18718810b92e0d0324456a67c 0\n";
@@ -66,25 +67,33 @@ bool CMasternodeConfig::read(std::string& strErr) {
             streamConfig.close();
             return false;
         }
+
+        // ZIXX Team - Multiport masternode
         int mainnetDefaultPort = Params(CBaseChainParams::MAIN).GetDefaultPort();
-        if(Params().NetworkIDString() == CBaseChainParams::MAIN) {
-            if(port != mainnetDefaultPort) {
+        if(!sporkManager.IsSporkActive(SPORK_98_MASTERNODE_MULTIPORT_ENABLED))
+        {
+            if(Params().NetworkIDString() == CBaseChainParams::MAIN) {
+                if(port != mainnetDefaultPort) {
+                    strErr = _("Invalid port detected in masternode.conf") + "\n" +
+                            strprintf(_("Port: %d"), port) + "\n" +
+                            strprintf(_("Line: %d"), linenumber) + "\n\"" + line + "\"" + "\n" +
+                            strprintf(_("(must be %d for mainnet)"), mainnetDefaultPort);
+                    streamConfig.close();
+                    return false;
+                }
+            }
+        }
+
+        // Using mainnet port on another network is a hassle for everyone.
+        if(Params().NetworkIDString() != CBaseChainParams::MAIN) {
+            if(port == mainnetDefaultPort) {
                 strErr = _("Invalid port detected in masternode.conf") + "\n" +
-                        strprintf(_("Port: %d"), port) + "\n" +
                         strprintf(_("Line: %d"), linenumber) + "\n\"" + line + "\"" + "\n" +
-                        strprintf(_("(must be %d for mainnet)"), mainnetDefaultPort);
+                        strprintf(_("(%d could be used only on mainnet)"), mainnetDefaultPort);
                 streamConfig.close();
                 return false;
             }
         }
-        else if(port == mainnetDefaultPort) {
-            strErr = _("Invalid port detected in masternode.conf") + "\n" +
-                    strprintf(_("Line: %d"), linenumber) + "\n\"" + line + "\"" + "\n" +
-                    strprintf(_("(%d could be used only on mainnet)"), mainnetDefaultPort);
-            streamConfig.close();
-            return false;
-        }
-
 
         add(alias, ip, privKey, txHash, outputIndex, rewardAddress);
     }

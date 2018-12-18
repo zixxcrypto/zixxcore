@@ -343,6 +343,8 @@ public:
 
     void AddOneShot(const std::string& strDest);
 
+    int ActiveProtocol();
+
     bool AddNode(const std::string& node);
     bool RemoveAddedNode(const std::string& node);
     std::vector<AddedNodeInfo> GetAddedNodeInfo();
@@ -351,6 +353,7 @@ public:
     void GetNodeStats(std::vector<CNodeStats>& vstats);
     bool DisconnectNode(const std::string& node);
     bool DisconnectNode(NodeId id);
+    bool DisconnectOlderNodes(int version);
 
     unsigned int GetSendBufferSize() const;
 

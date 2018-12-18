@@ -1,6 +1,7 @@
 // Copyright (c) 2009-2010 Satoshi Nakamoto
 // Copyright (c) 2009-2015 The Bitcoin Core developers
-// Copyright (c) 2014-2017 The Zixx developers
+// Copyright (c) 2014-2017 The Dash Core developers
+// Copyright (c) 2018-2018 The Zixx developers
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -98,7 +99,18 @@ void CConnman::AddOneShot(const std::string& strDest)
 
 unsigned short GetListenPort()
 {
-    return (unsigned short)(GetArg("-port", Params().GetDefaultPort()));
+    return static_cast<unsigned short>(GetArg("-port", Params().GetDefaultPort()));
+}
+
+int CConnman::ActiveProtocol()
+{
+    if(sporkManager.IsSporkActive(SPORK_97_MIN_VERSION_WATERMARK))
+    {
+        return static_cast<int>(sporkManager.GetSporkValue(SPORK_97_MIN_VERSION_WATERMARK) & std::numeric_limits<int>::max());
+    }
+
+    // Return the min protocol version if no spork is active.
+    return MIN_PEER_PROTO_VERSION;
 }
 
 // find 'best' local address for a particular peer
@@ -1737,9 +1749,8 @@ void CConnman::ThreadOpenConnections()
             if (nANow - addr.nLastTry < 600 && nTries < 30)
                 continue;
 
-            // do not allow non-default ports, unless after 50 invalid addresses selected already
-            if (addr.GetPort() != Params().GetDefaultPort() && nTries < 50)
-                continue;
+            // ZIXX Team - We've disabled the nonstandard port check, to unleash the potential of the masternodes
+            // without port restrictions.
 
             addrConnect = addr;
             break;
@@ -2472,6 +2483,20 @@ bool CConnman::DisconnectNode(NodeId id)
     }
     return false;
 }
+
+bool CConnman::DisconnectOlderNodes(int version)
+{
+    // Marking older nodes for disconnection
+    LOCK(cs_vNodes);
+    for(CNode* pnode : vNodes) {
+        if (pnode->nVersion < version) {
+            pnode->fDisconnect = true;
+            return true;
+        }
+    }
+    return false;
+}
+
 
 void CConnman::RelayTransaction(const CTransaction& tx)
 {

@@ -1,4 +1,5 @@
-// Copyright (c) 2014-2017 The Zixx developers
+// Copyright (c) 2014-2017 The Dash Core developers
+// Copyright (c) 2018-2018 The Zixx developers
 // Distributed under the MIT/X11 software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -45,6 +46,13 @@ CInstantSend instantsend;
 //
 // CInstantSend
 //
+int CInstantSend::ActiveProtocol()
+{
+    if(sporkManager.IsSporkActive(SPORK_97_MIN_VERSION_WATERMARK)) return STRICT_INSTANTSEND_PROTO_VERSION;
+
+    // Return the current protocol version if no spork is active.
+    return MIN_INSTANTSEND_PROTO_VERSION;
+}
 
 void CInstantSend::ProcessMessage(CNode* pfrom, std::string& strCommand, CDataStream& vRecv, CConnman& connman)
 {
@@ -55,7 +63,7 @@ void CInstantSend::ProcessMessage(CNode* pfrom, std::string& strCommand, CDataSt
 
     if (strCommand == NetMsgType::TXLOCKVOTE) // InstantSend Transaction Lock Consensus Votes
     {
-        if(pfrom->nVersion < MIN_INSTANTSEND_PROTO_VERSION) return;
+        if(pfrom->nVersion < ActiveProtocol()) return;
 
         CTxLockVote vote;
         vRecv >> vote;
@@ -214,7 +222,7 @@ void CInstantSend::Vote(CTxLockCandidate& txLockCandidate, CConnman& connman)
         int nLockInputHeight = nPrevoutHeight + 4;
 
         int nRank;
-        if(!mnodeman.GetMasternodeRank(activeMasternode.outpoint, nRank, nLockInputHeight, MIN_INSTANTSEND_PROTO_VERSION)) {
+        if(!mnodeman.GetMasternodeRank(activeMasternode.outpoint, nRank, nLockInputHeight, ActiveProtocol())) {
             LogPrint("instantsend", "CInstantSend::Vote -- Can't calculate rank for masternode %s\n", activeMasternode.outpoint.ToStringShort());
             ++itOutpointLock;
             continue;
@@ -1020,6 +1028,7 @@ bool CTxLockVote::IsValid(CNode* pnode, CConnman& connman) const
 
     int nLockInputHeight = coin.nHeight + 4;
 
+    // ZIXX Team: check to see if there's need to update an older voting entity
     int nRank;
     if(!mnodeman.GetMasternodeRank(outpointMasternode, nRank, nLockInputHeight, MIN_INSTANTSEND_PROTO_VERSION)) {
         //can be caused by past versions trying to vote with an invalid protocol

@@ -1,4 +1,5 @@
-// Copyright (c) 2014-2017 The Zixx developers
+// Copyright (c) 2014-2017 The Dash Core developers
+// Copyright (c) 2018-2018 The Zixx developers
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -99,6 +100,18 @@ void CSporkManager::ExecuteSpork(int nSporkID, int nValue)
         ReprocessBlocks(nValue);
         nTimeExecuted = GetTime();
     }
+
+    // Peers have to be removed if the spork version is valid and not the default one, for obvious reasons.
+    if(nSporkID == SPORK_97_MIN_VERSION_WATERMARK
+            && nValue > 0
+            && nValue != SPORK_97_MIN_VERSION_WATERMARK_DEFAULT
+            ) {
+        if(g_connman) {
+            g_connman->DisconnectOlderNodes(nValue);
+        }
+    }
+
+
 }
 
 bool CSporkManager::UpdateSpork(int nSporkID, int64_t nValue, CConnman& connman)
@@ -125,16 +138,18 @@ bool CSporkManager::IsSporkActive(int nSporkID)
         r = mapSporksActive[nSporkID].nValue;
     } else {
         switch (nSporkID) {
-            case SPORK_2_INSTANTSEND_ENABLED:               r = SPORK_2_INSTANTSEND_ENABLED_DEFAULT; break;
-            case SPORK_3_INSTANTSEND_BLOCK_FILTERING:       r = SPORK_3_INSTANTSEND_BLOCK_FILTERING_DEFAULT; break;
-            case SPORK_5_INSTANTSEND_MAX_VALUE:             r = SPORK_5_INSTANTSEND_MAX_VALUE_DEFAULT; break;
+            case SPORK_2_INSTANTSEND_ENABLED:               r = SPORK_2_INSTANTSEND_ENABLED_DEFAULT;            break;
+            case SPORK_3_INSTANTSEND_BLOCK_FILTERING:       r = SPORK_3_INSTANTSEND_BLOCK_FILTERING_DEFAULT;    break;
+            case SPORK_5_INSTANTSEND_MAX_VALUE:             r = SPORK_5_INSTANTSEND_MAX_VALUE_DEFAULT;          break;
             case SPORK_8_MASTERNODE_PAYMENT_ENFORCEMENT:    r = SPORK_8_MASTERNODE_PAYMENT_ENFORCEMENT_DEFAULT; break;
-            case SPORK_9_SUPERBLOCKS_ENABLED:               r = SPORK_9_SUPERBLOCKS_ENABLED_DEFAULT; break;
-            case SPORK_10_MASTERNODE_PAY_UPDATED_NODES:     r = SPORK_10_MASTERNODE_PAY_UPDATED_NODES_DEFAULT; break;
-            case SPORK_12_RECONSIDER_BLOCKS:                r = SPORK_12_RECONSIDER_BLOCKS_DEFAULT; break;
-            case SPORK_13_OLD_SUPERBLOCK_FLAG:              r = SPORK_13_OLD_SUPERBLOCK_FLAG_DEFAULT; break;
-            case SPORK_14_REQUIRE_SENTINEL_FLAG:            r = SPORK_14_REQUIRE_SENTINEL_FLAG_DEFAULT; break;
-            case SPORK_99_MASTERNODE_WATCHDOG_ENABLED:      r = SPORK_99_MASTERNODE_WATCHDOG_ENABLED_DEFAULT; break;
+            case SPORK_9_SUPERBLOCKS_ENABLED:               r = SPORK_9_SUPERBLOCKS_ENABLED_DEFAULT;            break;
+            case SPORK_10_MASTERNODE_PAY_UPDATED_NODES:     r = SPORK_10_MASTERNODE_PAY_UPDATED_NODES_DEFAULT;  break;
+            case SPORK_12_RECONSIDER_BLOCKS:                r = SPORK_12_RECONSIDER_BLOCKS_DEFAULT;             break;
+            case SPORK_13_OLD_SUPERBLOCK_FLAG:              r = SPORK_13_OLD_SUPERBLOCK_FLAG_DEFAULT;           break;
+            case SPORK_14_REQUIRE_SENTINEL_FLAG:            r = SPORK_14_REQUIRE_SENTINEL_FLAG_DEFAULT;         break;
+            case SPORK_97_MIN_VERSION_WATERMARK:            r = SPORK_97_MIN_VERSION_WATERMARK_DEFAULT;         break;
+            case SPORK_98_MASTERNODE_MULTIPORT_ENABLED:     r = SPORK_98_MASTERNODE_MULTIPORT_DEFAULT;          break;
+            case SPORK_99_MASTERNODE_WATCHDOG_ENABLED:      r = SPORK_99_MASTERNODE_WATCHDOG_ENABLED_DEFAULT;   break;
             default:
                 LogPrint("spork", "CSporkManager::IsSporkActive -- Unknown Spork ID %d\n", nSporkID);
                 r = 4070908800ULL; // 2099-1-1 i.e. off by default
@@ -161,6 +176,8 @@ int64_t CSporkManager::GetSporkValue(int nSporkID)
         case SPORK_12_RECONSIDER_BLOCKS:                return SPORK_12_RECONSIDER_BLOCKS_DEFAULT;
         case SPORK_13_OLD_SUPERBLOCK_FLAG:              return SPORK_13_OLD_SUPERBLOCK_FLAG_DEFAULT;
         case SPORK_14_REQUIRE_SENTINEL_FLAG:            return SPORK_14_REQUIRE_SENTINEL_FLAG_DEFAULT;
+        case SPORK_97_MIN_VERSION_WATERMARK:            return SPORK_97_MIN_VERSION_WATERMARK_DEFAULT;
+        case SPORK_98_MASTERNODE_MULTIPORT_ENABLED:     return SPORK_98_MASTERNODE_MULTIPORT_DEFAULT;
         case SPORK_99_MASTERNODE_WATCHDOG_ENABLED:      return SPORK_99_MASTERNODE_WATCHDOG_ENABLED_DEFAULT;
         default:
             LogPrint("spork", "CSporkManager::GetSporkValue -- Unknown Spork ID %d\n", nSporkID);
@@ -180,6 +197,8 @@ int CSporkManager::GetSporkIDByName(std::string strName)
     if (strName == "SPORK_12_RECONSIDER_BLOCKS")                return SPORK_12_RECONSIDER_BLOCKS;
     if (strName == "SPORK_13_OLD_SUPERBLOCK_FLAG")              return SPORK_13_OLD_SUPERBLOCK_FLAG;
     if (strName == "SPORK_14_REQUIRE_SENTINEL_FLAG")            return SPORK_14_REQUIRE_SENTINEL_FLAG;
+    if (strName == "SPORK_97_MIN_VERSION_WATERMARK")            return SPORK_97_MIN_VERSION_WATERMARK;
+    if (strName == "SPORK_98_MASTERNODE_MULTIPORT_ENABLED")     return SPORK_98_MASTERNODE_MULTIPORT_ENABLED;
     if (strName == "SPORK_99_MASTERNODE_WATCHDOG_ENABLED")      return SPORK_99_MASTERNODE_WATCHDOG_ENABLED;
 
     LogPrint("spork", "CSporkManager::GetSporkIDByName -- Unknown Spork name '%s'\n", strName);
@@ -198,6 +217,8 @@ std::string CSporkManager::GetSporkNameByID(int nSporkID)
         case SPORK_12_RECONSIDER_BLOCKS:                return "SPORK_12_RECONSIDER_BLOCKS";
         case SPORK_13_OLD_SUPERBLOCK_FLAG:              return "SPORK_13_OLD_SUPERBLOCK_FLAG";
         case SPORK_14_REQUIRE_SENTINEL_FLAG:            return "SPORK_14_REQUIRE_SENTINEL_FLAG";
+        case SPORK_97_MIN_VERSION_WATERMARK:            return "SPORK_97_MIN_VERSION_WATERMARK";
+        case SPORK_98_MASTERNODE_MULTIPORT_ENABLED:     return "SPORK_98_MASTERNODE_MULTIPORT_ENABLED";
         case SPORK_99_MASTERNODE_WATCHDOG_ENABLED:      return "SPORK_99_MASTERNODE_WATCHDOG_ENABLED";
         default:
             LogPrint("spork", "CSporkManager::GetSporkNameByID -- Unknown Spork ID %d\n", nSporkID);

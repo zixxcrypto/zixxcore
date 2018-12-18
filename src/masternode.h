@@ -1,4 +1,5 @@
-// Copyright (c) 2014-2017 The Zixx developers
+// Copyright (c) 2014-2017 The Dash Core developers
+// Copyright (c) 2018-2018 The Zixx developers
 // Distributed under the MIT/X11 software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -288,7 +289,7 @@ public:
 
     void UpdateWatchdogVoteTime(uint64_t nVoteTime = 0);
 
-    bool is_watchdog_expired_enabled() const { return sporkManager.IsSporkActive(SPORK_99_MASTERNODE_WATCHDOG_ENABLED); }
+    bool is_watchdog_expired_enabled()  const { return sporkManager.IsSporkActive(SPORK_99_MASTERNODE_WATCHDOG_ENABLED); }
 
     CMasternode& operator=(CMasternode const& from)
     {

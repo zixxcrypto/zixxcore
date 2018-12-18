@@ -1,4 +1,5 @@
-// Copyright (c) 2014-2017 The Zixx developers
+// Copyright (c) 2014-2017 The Dash Core developers
+// Copyright (c) 2018-2018 The Zixx developers
 // Distributed under the MIT/X11 software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 #include "privatesend.h"
@@ -66,7 +67,7 @@ bool CDarksendQueue::Relay(CConnman& connman)
 {
     std::vector<CNode*> vNodesCopy = connman.CopyNodeVector();
     BOOST_FOREACH(CNode* pnode, vNodesCopy)
-        if(pnode->nVersion >= MIN_PRIVATESEND_PEER_PROTO_VERSION)
+        if(pnode->nVersion >= CPrivateSend::ActiveProtocol())
             connman.PushMessage(pnode, NetMsgType::DSQUEUE, (*this));
 
     connman.ReleaseNodeVector(vNodesCopy);
@@ -150,6 +151,15 @@ std::string CPrivateSendBase::GetStateString() const
 std::vector<CAmount> CPrivateSend::vecStandardDenominations;
 std::map<uint256, CDarksendBroadcastTx> CPrivateSend::mapDSTX;
 CCriticalSection CPrivateSend::cs_mapdstx;
+
+
+int CPrivateSend::ActiveProtocol()
+{
+    if(sporkManager.IsSporkActive(SPORK_97_MIN_VERSION_WATERMARK)) return STRICT_PRIVATESEND_PEER_PROTO_VERSION;
+
+    // Return the current protocol version if no spork is active.
+    return MIN_PRIVATESEND_PEER_PROTO_VERSION;
+}
 
 void CPrivateSend::InitStandardDenominations()
 {

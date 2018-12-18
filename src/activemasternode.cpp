@@ -1,4 +1,5 @@
-// Copyright (c) 2014-2017 The Zixx developers
+// Copyright (c) 2014-2017 The Dash Core developers
+// Copyright (c) 2018-2018 The Zixx developers
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -7,6 +8,7 @@
 #include "masternode-sync.h"
 #include "masternodeman.h"
 #include "protocol.h"
+#include "spork.h"
 
 // Keep track of the active Masternode
 CActiveMasternode activeMasternode;
@@ -165,19 +167,28 @@ void CActiveMasternode::ManageStateInitial(CConnman& connman)
         return;
     }
 
+    // ZIXX Team - Multiport Masternode
     int mainnetDefaultPort = Params(CBaseChainParams::MAIN).GetDefaultPort();
-    if(Params().NetworkIDString() == CBaseChainParams::MAIN) {
-        if(service.GetPort() != mainnetDefaultPort) {
+    if(!sporkManager.IsSporkActive(SPORK_98_MASTERNODE_MULTIPORT_ENABLED))
+    {
+        if(Params().NetworkIDString() == CBaseChainParams::MAIN) {
+            if(service.GetPort() != mainnetDefaultPort) {
+                nState = ACTIVE_MASTERNODE_NOT_CAPABLE;
+                strNotCapableReason = strprintf("Invalid port: %u - only %d is supported on mainnet.", service.GetPort(), mainnetDefaultPort);
+                LogPrintf("CActiveMasternode::ManageStateInitial -- %s: %s\n", GetStateString(), strNotCapableReason);
+                return;
+            }
+        }
+    }
+
+    // Mainnet port only for mainnet.
+    if(Params().NetworkIDString() != CBaseChainParams::MAIN) {
+        if(service.GetPort() == mainnetDefaultPort) {
             nState = ACTIVE_MASTERNODE_NOT_CAPABLE;
-            strNotCapableReason = strprintf("Invalid port: %u - only %d is supported on mainnet.", service.GetPort(), mainnetDefaultPort);
+            strNotCapableReason = strprintf("Invalid port: %u - %d is only supported on mainnet.", service.GetPort(), mainnetDefaultPort);
             LogPrintf("CActiveMasternode::ManageStateInitial -- %s: %s\n", GetStateString(), strNotCapableReason);
             return;
         }
-    } else if(service.GetPort() == mainnetDefaultPort) {
-        nState = ACTIVE_MASTERNODE_NOT_CAPABLE;
-        strNotCapableReason = strprintf("Invalid port: %u - %d is only supported on mainnet.", service.GetPort(), mainnetDefaultPort);
-        LogPrintf("CActiveMasternode::ManageStateInitial -- %s: %s\n", GetStateString(), strNotCapableReason);
-        return;
     }
 
     LogPrintf("CActiveMasternode::ManageStateInitial -- Checking inbound connection to '%s'\n", service.ToString());

@@ -1,4 +1,5 @@
-// Copyright (c) 2014-2017 The Zixx developers
+// Copyright (c) 2014-2017 The Dash Core developers
+// Copyright (c) 2018-2018 The Zixx developers
 // Distributed under the MIT/X11 software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -188,7 +189,7 @@ UniValue masternode(const UniValue& params, bool fHelp)
         std::string strMode = params[1].get_str();
 
         if (strMode == "ps")
-            return mnodeman.CountEnabled(MIN_PRIVATESEND_PEER_PROTO_VERSION);
+            return mnodeman.CountEnabled(CPrivateSend::ActiveProtocol());
 
         if (strMode == "enabled")
             return mnodeman.CountEnabled();
@@ -202,8 +203,8 @@ UniValue masternode(const UniValue& params, bool fHelp)
 
         if (strMode == "all")
             return strprintf("Total: %d (PS Compatible: %d / Enabled: %d / Qualify: %d)",
-                mnodeman.size(), mnodeman.CountEnabled(MIN_PRIVATESEND_PEER_PROTO_VERSION),
-                mnodeman.CountEnabled(), nCount);
+                             mnodeman.size(), mnodeman.CountEnabled(CPrivateSend::ActiveProtocol()),
+                             mnodeman.CountEnabled(), nCount);
     }
 
     if (strCommand == "current" || strCommand == "winner")

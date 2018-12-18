@@ -1,4 +1,5 @@
-// Copyright (c) 2014-2017 The Zixx developers
+// Copyright (c) 2014-2017 The Dash Core developers
+// Copyright (c) 2018-2018 The Zixx developers
 // Distributed under the MIT/X11 software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 #include "privatesend-client.h"
@@ -28,7 +29,7 @@ void CPrivateSendClient::ProcessMessage(CNode* pfrom, std::string& strCommand, C
         TRY_LOCK(cs_darksend, lockRecv);
         if(!lockRecv) return;
 
-        if(pfrom->nVersion < MIN_PRIVATESEND_PEER_PROTO_VERSION) {
+        if(pfrom->nVersion < CPrivateSend::ActiveProtocol()) {
             LogPrint("privatesend", "DSQUEUE -- incompatible version! nVersion: %d\n", pfrom->nVersion);
             return;
         }
@@ -78,7 +79,7 @@ void CPrivateSendClient::ProcessMessage(CNode* pfrom, std::string& strCommand, C
                 }
             }
 
-            int nThreshold = infoMn.nLastDsq + mnodeman.CountEnabled(MIN_PRIVATESEND_PEER_PROTO_VERSION)/5;
+            int nThreshold = infoMn.nLastDsq + mnodeman.CountEnabled(CPrivateSend::ActiveProtocol())/5;
             LogPrint("privatesend", "DSQUEUE -- nLastDsq: %d  threshold: %d  nDsqCount: %d\n", infoMn.nLastDsq, nThreshold, mnodeman.nDsqCount);
             //don't allow a few nodes to dominate the queuing process
             if(infoMn.nLastDsq != 0 && nThreshold > mnodeman.nDsqCount) {
@@ -98,7 +99,7 @@ void CPrivateSendClient::ProcessMessage(CNode* pfrom, std::string& strCommand, C
 
     } else if(strCommand == NetMsgType::DSSTATUSUPDATE) {
 
-        if(pfrom->nVersion < MIN_PRIVATESEND_PEER_PROTO_VERSION) {
+        if(pfrom->nVersion < CPrivateSend::ActiveProtocol()) {
             LogPrintf("DSSTATUSUPDATE -- incompatible version! nVersion: %d\n", pfrom->nVersion);
             return;
         }
@@ -142,7 +143,7 @@ void CPrivateSendClient::ProcessMessage(CNode* pfrom, std::string& strCommand, C
 
     } else if(strCommand == NetMsgType::DSFINALTX) {
 
-        if(pfrom->nVersion < MIN_PRIVATESEND_PEER_PROTO_VERSION) {
+        if(pfrom->nVersion < CPrivateSend::ActiveProtocol()) {
             LogPrintf("DSFINALTX -- incompatible version! nVersion: %d\n", pfrom->nVersion);
             return;
         }
@@ -169,7 +170,7 @@ void CPrivateSendClient::ProcessMessage(CNode* pfrom, std::string& strCommand, C
 
     } else if(strCommand == NetMsgType::DSCOMPLETE) {
 
-        if(pfrom->nVersion < MIN_PRIVATESEND_PEER_PROTO_VERSION) {
+        if(pfrom->nVersion < CPrivateSend::ActiveProtocol()) {
             LogPrintf("DSCOMPLETE -- incompatible version! nVersion: %d\n", pfrom->nVersion);
             return;
         }
@@ -802,7 +803,7 @@ bool CPrivateSendClient::DoAutomaticDenominating(CConnman& connman, bool fDryRun
         }
     }
 
-    int nMnCountEnabled = mnodeman.CountEnabled(MIN_PRIVATESEND_PEER_PROTO_VERSION);
+    int nMnCountEnabled = mnodeman.CountEnabled(CPrivateSend::ActiveProtocol());
 
     // If we've used 90% of the Masternode list then drop the oldest first ~30%
     int nThreshold_high = nMnCountEnabled * 0.9;
@@ -847,7 +848,7 @@ bool CPrivateSendClient::JoinExistingQueue(CAmount nBalanceNeedsAnonymized, CCon
             continue;
         }
 
-        if(infoMn.nProtocolVersion < MIN_PRIVATESEND_PEER_PROTO_VERSION) continue;
+        if(infoMn.nProtocolVersion < CPrivateSend::ActiveProtocol()) continue;
 
         std::vector<int> vecBits;
         if(!CPrivateSend::GetDenominationsBits(dsq.nDenom, vecBits)) {
@@ -909,7 +910,7 @@ bool CPrivateSendClient::JoinExistingQueue(CAmount nBalanceNeedsAnonymized, CCon
 bool CPrivateSendClient::StartNewQueue(CAmount nValueMin, CAmount nBalanceNeedsAnonymized, CConnman& connman)
 {
     int nTries = 0;
-    int nMnCountEnabled = mnodeman.CountEnabled(MIN_PRIVATESEND_PEER_PROTO_VERSION);
+    int nMnCountEnabled = mnodeman.CountEnabled(CPrivateSend::ActiveProtocol());
 
     // ** find the coins we'll use
     std::vector<CTxIn> vecTxIn;
@@ -923,7 +924,7 @@ bool CPrivateSendClient::StartNewQueue(CAmount nValueMin, CAmount nBalanceNeedsA
 
     // otherwise, try one randomly
     while(nTries < 10) {
-        masternode_info_t infoMn = mnodeman.FindRandomNotInVec(vecMasternodesUsed, MIN_PRIVATESEND_PEER_PROTO_VERSION);
+        masternode_info_t infoMn = mnodeman.FindRandomNotInVec(vecMasternodesUsed, CPrivateSend::ActiveProtocol());
         if(!infoMn.fInfoValid) {
             LogPrintf("CPrivateSendClient::StartNewQueue -- Can't find random masternode!\n");
             strAutoDenomResult = _("Can't find random Masternode.");

@@ -1,4 +1,5 @@
-// Copyright (c) 2014-2017 The Zixx developers
+// Copyright (c) 2014-2017 The Dash Core developers
+// Copyright (c) 2018-2018 The Zixx developers
 // Distributed under the MIT/X11 software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -24,6 +25,7 @@ static const int PRIVATESEND_SIGNING_TIMEOUT        = 15;
 
 //! minimum peer version accepted by mixing pool
 static const int MIN_PRIVATESEND_PEER_PROTO_VERSION = 70208;
+static const int STRICT_PRIVATESEND_PEER_PROTO_VERSION = 70209;
 
 static const CAmount PRIVATESEND_ENTRY_MAX_SIZE     = 9;
 
@@ -322,6 +324,9 @@ private:
 
 public:
     static void InitStandardDenominations();
+
+    static int ActiveProtocol();
+
     static std::vector<CAmount> GetStandardDenominations() { return vecStandardDenominations; }
     static CAmount GetSmallestDenomination() { return vecStandardDenominations.back(); }
 

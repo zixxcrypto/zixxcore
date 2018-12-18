@@ -1,4 +1,5 @@
-// Copyright (c) 2014-2017 The Zixx developers
+// Copyright (c) 2014-2017 The Dash Core developers
+// Copyright (c) 2018-2018 The Zixx developers
 // Distributed under the MIT/X11 software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 #ifndef INSTANTX_H
@@ -29,6 +30,7 @@ static const int INSTANTSEND_CONFIRMATIONS_REQUIRED = 6;
 static const int DEFAULT_INSTANTSEND_DEPTH          = 5;
 
 static const int MIN_INSTANTSEND_PROTO_VERSION      = 70208;
+static const int STRICT_INSTANTSEND_PROTO_VERSION   = 70209;
 
 // For how long we are going to accept votes/locks
 // after we saw the first one for a specific transaction
@@ -82,6 +84,8 @@ private:
 
 public:
     CCriticalSection cs_instantsend;
+
+    int ActiveProtocol();
 
     void ProcessMessage(CNode* pfrom, std::string& strCommand, CDataStream& vRecv, CConnman& connman);
 
